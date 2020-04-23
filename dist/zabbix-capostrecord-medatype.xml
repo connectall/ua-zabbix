@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<zabbix_export>
+    <version>4.4</version>
+    <date>2020-04-23T21:56:53Z</date>
+    <media_types>
+        <media_type>
+            <name>zabbix-ca-wrapper</name>
+            <type>WEBHOOK</type>
+            <parameters>
+                <parameter>
+                    <name>alarm_message</name>
+                    <value>{ALERT.MESSAGE}</value>
+                </parameter>
+                <parameter>
+                    <name>alarm_summary</name>
+                    <value>{ALERT.SUBJECT}</value>
+                </parameter>
+                <parameter>
+                    <name>ca_alarm_applink</name>
+                    <value>ZabbixJira</value>
+                </parameter>
+                <parameter>
+                    <name>ca_api_key</name>
+                    <value>11688f9c-d114-4035-a2d5-71c6284adcbb</value>
+                </parameter>
+                <parameter>
+                    <name>ca_base_url</name>
+                    <value>http://192.168.56.103:8090</value>
+                </parameter>
+                <parameter>
+                    <name>ca_event_applink</name>
+                    <value>ZabbixJira</value>
+                </parameter>
+                <parameter>
+                    <name>event_ack_status</name>
+                    <value>{EVENT.ACK.STATUS}</value>
+                </parameter>
+                <parameter>
+                    <name>event_date</name>
+                    <value>{EVENT.DATE}</value>
+                </parameter>
+                <parameter>
+                    <name>event_id</name>
+                    <value>{EVENT.ID}</value>
+                </parameter>
+                <parameter>
+                    <name>event_name</name>
+                    <value>{EVENT.NAME}</value>
+                </parameter>
+                <parameter>
+                    <name>event_nseverity</name>
+                    <value>{EVENT.NSEVERITY} ​ ​</value>
+                </parameter>
+                <parameter>
+                    <name>event_opdata</name>
+                    <value>{EVENT.OPDATA}</value>
+                </parameter>
+                <parameter>
+                    <name>event_severity</name>
+                    <value>{EVENT.SEVERITY}</value>
+                </parameter>
+                <parameter>
+                    <name>event_time</name>
+                    <value>{EVENT.TIME}</value>
+                </parameter>
+                <parameter>
+                    <name>event_update_action</name>
+                    <value>{EVENT.UPDATE.ACTION}</value>
+                </parameter>
+                <parameter>
+                    <name>event_update_date</name>
+                    <value>{EVENT.UPDATE.DATE}</value>
+                </parameter>
+                <parameter>
+                    <name>event_update_message</name>
+                    <value>{EVENT.UPDATE.MESSAGE}</value>
+                </parameter>
+                <parameter>
+                    <name>event_update_status</name>
+                    <value>{EVENT.UPDATE.STATUS}</value>
+                </parameter>
+                <parameter>
+                    <name>event_value</name>
+                    <value>{EVENT.VALUE}</value>
+                </parameter>
+                <parameter>
+                    <name>host_ip</name>
+                    <value>{HOST.IP}</value>
+                </parameter>
+                <parameter>
+                    <name>host_name</name>
+                    <value>{HOST.NAME}</value>
+                </parameter>
+                <parameter>
+                    <name>trigger_description</name>
+                    <value>{TRIGGER.DESCRIPTION}</value>
+                </parameter>
+                <parameter>
+                    <name>trigger_id</name>
+                    <value>{TRIGGER.ID}</value>
+                </parameter>
+                <parameter>
+                    <name>zabbix_url</name>
+                    <value>http://zabbix.connectall.com</value>
+                </parameter>
+            </parameters>
+            <script>var EVENT_STATUS = {&#13;
+    PROBLEM: 'PROBLEM',&#13;
+    UPDATE: 'UPDATE',&#13;
+    RESOLVE: 'OK'&#13;
+}&#13;
+&#13;
+if (!String.prototype.format) {&#13;
+    String.prototype.format = function () {&#13;
+        var args = arguments;&#13;
+        return this.replace(/{(\d+)}/g, function (match, number) {&#13;
+            return number in args&#13;
+                ? args[number]&#13;
+                : match&#13;
+                ;&#13;
+        });&#13;
+    };&#13;
+}&#13;
+&#13;
+function isEventProblem(params) {&#13;
+    return params.event_value == 1&#13;
+        &amp;&amp; params.event_update_status == 0;&#13;
+}&#13;
+&#13;
+function isEventUpdate(params) {&#13;
+    return params.event_value == 1&#13;
+        &amp;&amp; params.event_update_status == 1;&#13;
+}&#13;
+&#13;
+function isEventResolve(params) {&#13;
+    return params.event_value == 0;&#13;
+}&#13;
+&#13;
+function createProblemURL(zabbixURL, triggerId, eventId) {&#13;
+    var problemURL = '{0}/tr_events.php?triggerid={1}&amp;eventid={2}'&#13;
+        .format(&#13;
+            zabbixURL.replace(/\/+$/, ''),&#13;
+            triggerId,&#13;
+            eventId&#13;
+        );&#13;
+&#13;
+    return problemURL&#13;
+}&#13;
+&#13;
+function getTagValue(eventTags, key) {&#13;
+    var pattern = new RegExp('(' + key + ':.+)');&#13;
+    var tagValue = eventTags&#13;
+        .split(',')&#13;
+        .filter(function (v) { return v.match(pattern) })&#13;
+        .map(function (v) { return v.split(':')[1] })[0]&#13;
+        || 0;&#13;
+&#13;
+    return tagValue;&#13;
+}&#13;
+&#13;
+function notifyConnectALL(params) {&#13;
+    reqBody = {&#13;
+        appLinkName: params.ca_event_applink&#13;
+    }&#13;
+&#13;
+    var status = EVENT_STATUS.PROBLEM;&#13;
+    var eventDate = params.event_date;&#13;
+    var eventTime = params.event_time;&#13;
+    var message = params.event_opdata;&#13;
+&#13;
+    if (isEventUpdate(params)) {&#13;
+        status = EVENT_STATUS.UPDATE;&#13;
+        message = params.event_update_message;&#13;
+    } else if (isEventResolve(params)) {&#13;
+        status = EVENT_STATUS.RESOLVE;&#13;
+        message = params.event_update_message;&#13;
+    }&#13;
+&#13;
+    reqBody.fields = createMessage(&#13;
+        status,&#13;
+        eventDate,&#13;
+        eventTime,&#13;
+        message,&#13;
+        createProblemURL(params.zabbix_url, params.trigger_id, params.event_id)&#13;
+    ); &#13;
+&#13;
+    Zabbix.Log(3, 'ConnectALL PostRecord Request : ' + JSON.stringify(reqBody));&#13;
+    var resp = JSON.parse(req.Post(ConnectAll.postMessage, JSON.stringify(reqBody)));&#13;
+    Zabbix.Log(3, 'ConnectALL PostRecord Response  : ' + JSON.stringify(resp));&#13;
+    if (resp.Response != &quot;Success&quot;) {&#13;
+        throw resp.Message;&#13;
+    }&#13;
+}&#13;
+&#13;
+function createMessage(&#13;
+    status,&#13;
+    event_date,&#13;
+    event_time,&#13;
+    message,&#13;
+    problemURL&#13;
+) {&#13;
+&#13;
+    var message = {&#13;
+        'id' : params.event_id,&#13;
+        'name': params.event_name,&#13;
+        'status': status,&#13;
+        'description': message,&#13;
+        'severity': params.event_severity,&#13;
+        'triggerDescription': params.trigger_description,&#13;
+        'triggerid': params.trigger_id,&#13;
+        'host': '{0} [{1}]'.format(params.host_name, params.host_ip),&#13;
+        'updateDt': new Date(),&#13;
+        'eventLink': problemURL,&#13;
+        'eventDt': '{0} {1}'.format(event_date, event_time)&#13;
+    }&#13;
+    return message;&#13;
+}&#13;
+&#13;
+try {&#13;
+    var params = JSON.parse(value),&#13;
+        req = new CurlHttpRequest(),&#13;
+        reqBody = {},&#13;
+        result = {};&#13;
+&#13;
+    req.AddHeader('Content-Type: application/json; charset=utf-8');&#13;
+&#13;
+    var ConnectAll = {&#13;
+        postMessage: params.ca_base_url + '/connectall/api/2/postRecord?apikey='+params.ca_api_key,&#13;
+    }&#13;
+&#13;
+    notifyConnectALL(params);&#13;
+    return JSON.stringify(result);&#13;
+&#13;
+} catch (error) {&#13;
+    Zabbix.Log(3, 'ConnectALL push failed : ' + error);&#13;
+    throw 'ConnectALL push failed : ' + error;&#13;
+}</script>
+        </media_type>
+    </media_types>
+</zabbix_export>

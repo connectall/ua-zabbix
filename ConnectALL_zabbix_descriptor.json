@@ -1,0 +1,117 @@
+{
+    "version": null,
+    "displayName": "Zabbix",
+    "type": "zabbix",
+    "logo": "zabbix.png",
+    "logoSmall": "zabbix-small.png",
+    "metadata": [
+        {
+            "name": "issuetype",
+            "dependent": false,
+            "dependentMetadata": null,
+            "values": [
+                {
+                    "id": "event",
+                    "name": "Event",
+                    "attributeName": null,
+                    "referenceType": null,
+                    "dependents": null,
+                    "regex": false
+                }
+            ]
+        }
+    ],
+    "fields": [
+        {
+            "id": "id",
+            "name": "Id",
+            "datatype": "String",
+            "values": null
+        },
+        {
+            "id": "name",
+            "name": "Name",
+            "datatype": "String",
+            "values": null
+        },
+        {
+            "id": "description",
+            "name": "Description",
+            "datatype": "String",
+            "values": null
+        },{
+            "id": "severity",
+            "name": "Severity",
+            "datatype": "String",
+            "values": null
+        },
+        {
+            "id": "status",
+            "name": "Status",
+            "datatype": "String",
+            "values": null
+        },
+        {
+            "id": "triggerid",
+            "name": "Trigger Id",
+            "datatype": "String",
+            "values": null
+        },
+        {
+            "id": "triggerDescription",
+            "name": "Trigger Description",
+            "datatype": "String",
+            "values": null
+        },
+        {
+            "id": "host",
+            "name": "Host",
+            "datatype": "String",
+            "values": null
+        },
+        {
+            "id": "updateDt",
+            "name": "Updated",
+            "datatype": "Datetime",
+            "values": null
+        },
+        {
+            "id": "eventDt",
+            "name": "Event Date",
+            "datatype": "Datetime",
+            "values": null
+        },
+        {
+            "id": "eventLink",
+            "name": "Hyperlink",
+            "datatype": "String",
+            "values": null
+        }
+    ],
+    "loginOptions": [],
+    "idFieldName": "id",
+    "titleFieldName": "name",
+    "projectFieldName": "",
+    "artifactFieldName": "",
+    "testStepsFieldName": "",
+    "changedDateFieldName": "updateDt",
+    "dateFormat": "yyyy-MM-dd",
+    "dateTimeFormat": "yyyy-MM-dd'T'HH:mm:ss",
+    "queryDateFormat": "yyyy-MM-dd'T'HH:mm:ss",
+    "isISO8601DateFormat": "false",
+    "commentFieldName": "",
+    "commentFieldId": "",
+    "attachmentFieldName": "",
+    "attachmentFieldId": "",
+    "apiVersion": "1",
+    "callBackUrlConfigured": false,
+    "callBackUrls": [],
+    "apiProvider": "ConnectAll",
+    "applicationType": null,
+    "urlDescription": "",
+    "userNameDescription": "",
+    "passwordDescription": "",
+    "paginationSupported": false,
+    "paginationAttributes": null,
+    "status": "Active"
+}
