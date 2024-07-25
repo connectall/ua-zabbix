@@ -1,4 +1,4 @@
-# connectall-zabbix-adapter
+# ua-zabbix
 Zabbix adapter for ConnectALL
 
 ConnectALL Zabbix adapter is built on top of Universal adapter configuration. 
